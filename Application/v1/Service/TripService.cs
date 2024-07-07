@@ -1,35 +1,27 @@
 ﻿using Application.v1.Interfaces;
 using Application.v1.ViewModels.Requests.Trips;
+using AutoMapper;
 using Core.v1.Entities;
 using Core.v1.Interfaces;
 
 namespace Application.v1.Service
 {
-    public class TripService : ITripService
+    public class TripService(ITripRepository tripRepository, IMapper mapper) : ITripService
     {
-        private readonly ITripRepository _tripRepository;
-
-        public TripService(ITripRepository tripRepository)
-        {
-            _tripRepository = tripRepository;
-        }
+        private readonly ITripRepository _tripRepository = tripRepository;
+        private readonly IMapper _mapper = mapper;
 
         public async Task AddTripAsync(AddTripRequest trip)
         {
             if (trip.Validate() is false)
-                throw new Exception("falha");
+                throw new Exception(string.Join(Environment.NewLine, trip.ValidationErrors!));
 
-            Trip entity = new()
-            {
-                TripDescription = trip.TripName!,
-                Id = trip.Id,
-                TripName = trip.TripName!
-            };
+            Trip entity = _mapper.Map<Trip>(trip);
 
             await _tripRepository.AddAsync(entity);
         }
 
-        public async Task DeleteTripAsync(int id)
+        public async Task DeleteTripAsync(Guid id)
         {
             await _tripRepository.DeleteAsync(id);
         }
@@ -39,14 +31,17 @@ namespace Application.v1.Service
             return await _tripRepository.GetAllAsync();
         }
 
-        public async Task<Trip> GetTripByIdAsync(int id)
+        public async Task<Trip?> GetTripByIdAsync(Guid id)
         {
             return await _tripRepository.GetByIdAsync(id);
         }
 
-        public async Task UpdateTripAsync(Trip trip)
+        public async Task UpdateTripAsync(UpdateTripRequest trip)
         {
-            await _tripRepository.UpdateAsync(trip);
+            if (trip.Validate() is false)
+                throw new Exception(string.Join(Environment.NewLine, trip.ValidationErrors!));
+
+            await _tripRepository.UpdateAsync(_mapper.Map<Trip>(trip));
         }
     }
 }

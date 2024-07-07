@@ -6,9 +6,9 @@ namespace Application.v1.Interfaces
     public interface ITripService
     {
         Task<IEnumerable<Trip>> GetAllTripsAsync();
-        Task<Trip> GetTripByIdAsync(int id);
+        Task<Trip?> GetTripByIdAsync(Guid id);
         Task AddTripAsync(AddTripRequest trip);
-        Task UpdateTripAsync(Trip trip);
-        Task DeleteTripAsync(int id);
+        Task UpdateTripAsync(UpdateTripRequest trip);
+        Task DeleteTripAsync(Guid id);
     }
 }

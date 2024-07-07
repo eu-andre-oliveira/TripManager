@@ -12,22 +12,30 @@ namespace Infrastructure.v1.Repositories
         public TripRepository(AppDbContext appDbContext)
         {
             _appDbContext = appDbContext;
-            if (_appDbContext.Trips.Count() == 0)
+            if (_appDbContext.Trips.Any() is false)
             {
-                _appDbContext.Trips.Add(new Trip() { Id = 1, TripName = "Item1", TripDescription = "viagem inicial 1" });
-                _appDbContext.Trips.Add(new Trip() { Id = 2, TripName = "Item2", TripDescription = " viagem inicial 2" });
-                _appDbContext.SaveChanges();
+                //Used in initial tests. Keeped for example 
+                //_appDbContext.Trips.Add(new Trip() { Id = 1, TripName = "Item1", TripDescription = "viagem inicial 1" });
+                //_appDbContext.Trips.Add(new Trip() { Id = 2, TripName = "Item2", TripDescription = " viagem inicial 2" });
+                //_appDbContext.SaveChanges();
             }
         }
 
-        public Task AddAsync(Trip add)
+        public async Task AddAsync(Trip add)
         {
-            throw new NotImplementedException();
+            add.Id = Guid.NewGuid();
+            await _appDbContext.AddAsync(add);
+            await _appDbContext.SaveChangesAsync();
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
-            throw new NotImplementedException();
+            Trip? trip = await _appDbContext.Trips.FindAsync(id) ??
+                throw new Exception($"Remove trip {id} fail");
+
+            _appDbContext.Remove(trip);
+            _appDbContext.SaveChanges();
+            return;
         }
 
         public async Task<IEnumerable<Trip>> GetAllAsync()
@@ -35,14 +43,28 @@ namespace Infrastructure.v1.Repositories
             return await _appDbContext.Trips.ToListAsync();
         }
 
-        public Task<Trip> GetByIdAsync(int id)
+        public async Task<Trip?> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return await _appDbContext.Trips.FindAsync(id);
         }
 
-        public Task UpdateAsync(Trip update)
+        public async Task UpdateAsync(Trip update)
         {
-            throw new NotImplementedException();
+            ArgumentNullException.ThrowIfNull(update);
+
+            Trip? existingTrip = await _appDbContext.Trips.FindAsync(update.Id) ??
+                throw new KeyNotFoundException($"Trip with ID {update.Id} not found.");
+
+            _appDbContext.Entry(existingTrip).CurrentValues.SetValues(update);
+
+            try
+            {
+                await _appDbContext.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new Exception("Concurrency conflict occurred.", ex);
+            }
         }
     }
 }

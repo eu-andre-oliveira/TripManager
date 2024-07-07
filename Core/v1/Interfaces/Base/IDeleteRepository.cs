@@ -2,6 +2,6 @@
 {
     public interface IDeleteRepository<T>
     {
-        Task DeleteAsync(int id);
+        Task DeleteAsync(Guid id);
     }
 }

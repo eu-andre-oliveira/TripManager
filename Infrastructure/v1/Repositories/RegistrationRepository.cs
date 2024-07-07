@@ -13,7 +13,7 @@ namespace Infrastructure.v1.Repositories
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(int id)
+        public Task DeleteAsync(Guid id)
         {
             throw new NotImplementedException();
         }
@@ -23,7 +23,7 @@ namespace Infrastructure.v1.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<Registration> GetByIdAsync(int id)
+        public Task<Registration?> GetByIdAsync(Guid id)
         {
             throw new NotImplementedException();
         }

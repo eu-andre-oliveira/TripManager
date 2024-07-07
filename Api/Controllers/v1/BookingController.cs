@@ -1,31 +1,33 @@
 ﻿using Application.v1.Interfaces;
 using Application.v1.ViewModels.Requests.Trips;
+using Application.v1.ViewModels.Responses.Trips;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers.v1
 {
     [Route("api/booking/")]
     [ApiController]
-    public class BookingController(ITripService tripService) : ControllerBase
+    public class BookingController(ITripService tripService, IMapper mapper) : ControllerBase
     {
         private readonly ITripService _tripService = tripService;
+        private readonly IMapper _mapper = mapper;
 
         [HttpGet("GetAllTrips")]
         public async Task<IActionResult> GetAll()
         {
-            return Ok(await _tripService.GetAllTripsAsync());
+            return Ok(_mapper.Map<TripListResponse>(await _tripService.GetAllTripsAsync()));
         }
 
         [HttpGet("GetTrip/{id}")]
-        public async Task<IActionResult> GetTripById(int id)
+        public async Task<IActionResult> GetTripById(Guid id)
         {
-            return Ok(await _tripService.GetTripByIdAsync(id));
+            return Ok(_mapper.Map<TripResponse>(await _tripService.GetTripByIdAsync(id)));
         }
 
         [HttpPost("AddTrip")]
         public async Task<IActionResult> Add(AddTripRequest request)
         {
-
             try
             {
                 await _tripService.AddTripAsync(request);
@@ -37,7 +39,22 @@ namespace Api.Controllers.v1
             }
         }
 
-    
+
+        [HttpPut("UpdateTrip")]
+        public async Task<IActionResult> Update(UpdateTripRequest request)
+        {
+            try
+            {
+                await _tripService.UpdateTripAsync(request);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
 
     }
