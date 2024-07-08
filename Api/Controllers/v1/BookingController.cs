@@ -1,61 +1,57 @@
 ﻿using Application.v1.Interfaces;
-using Application.v1.ViewModels.Requests.Trips;
-using Application.v1.ViewModels.Responses.Trips;
+using Application.v1.ViewModels.Responses.Registrations;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Api.Controllers.v1
 {
     [Route("api/booking/")]
     [ApiController]
-    public class BookingController(ITripService tripService, IMapper mapper) : ControllerBase
+    public class BookingController : ControllerBase
     {
-        private readonly ITripService _tripService = tripService;
-        private readonly IMapper _mapper = mapper;
+        private readonly ITripRegistrationService _tripRegistrationService;
+        private readonly IMapper _mapper;
 
-        [HttpGet("GetAllTrips")]
-        public async Task<IActionResult> GetAll()
+        public BookingController( IMapper mapper, ITripRegistrationService tripRegistrationService)
         {
-            return Ok(_mapper.Map<TripListResponse>(await _tripService.GetAllTripsAsync()));
+            _mapper = mapper;
+            _tripRegistrationService = tripRegistrationService;
         }
 
-        [HttpGet("GetTrip/{id}")]
-        public async Task<IActionResult> GetTripById(Guid id)
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAsync()
         {
-            return Ok(_mapper.Map<TripResponse>(await _tripService.GetTripByIdAsync(id)));
-        }
-
-        [HttpPost("AddTrip")]
-        public async Task<IActionResult> Add(AddTripRequest request)
-        {
-            try
-            {
-                await _tripService.AddTripAsync(request);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_mapper.Map<RegistrationsListResponse>(await _tripRegistrationService.GetAllAsync()));
         }
 
 
-        [HttpPut("UpdateTrip")]
-        public async Task<IActionResult> Update(UpdateTripRequest request)
+        [HttpGet("GetById/{id}")]
+        public async Task<IActionResult> Get(Guid id)
         {
-            try
-            {
-                await _tripService.UpdateTripAsync(request);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(_mapper.Map<RegistrationResponse>(await _tripRegistrationService.GetAsync(id)));
         }
 
 
+        [HttpPost("Add")]
+        public async Task<IActionResult> Post([FromBody] string value)
+        {
+            return Ok();
+        }
 
 
+        [HttpPut("Update/{id}")]
+        public async Task<IActionResult> Put(Guid id, [FromBody] string value)
+        {
+            return Ok();
+        }
+
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            return Ok();
+        }
     }
 }

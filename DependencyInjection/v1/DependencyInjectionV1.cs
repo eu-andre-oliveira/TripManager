@@ -19,6 +19,8 @@ namespace DependencyInjection.v1
             #region services
 
             services.AddScoped<ITripService, TripService>();
+            services.AddScoped<ITripRegistrationService, TripRegistrationService>();
+            
 
             #endregion
 
