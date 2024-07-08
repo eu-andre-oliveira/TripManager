@@ -19,13 +19,13 @@ namespace Api.Controllers.v1
             return Ok(_mapper.Map<TripListResponse>(await _tripService.GetAllTripsAsync()));
         }
 
-        [HttpGet("GetTrip/{id}")]
+        [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetTripById(Guid id)
         {
             return Ok(_mapper.Map<TripResponse>(await _tripService.GetTripByIdAsync(id)));
         }
 
-        [HttpPost("AddTrip")]
+        [HttpPost("Add")]
         public async Task<IActionResult> Add(AddTripRequest request)
         {
             try
@@ -39,7 +39,7 @@ namespace Api.Controllers.v1
             }
         }
 
-        [HttpPut("UpdateTrip")]
+        [HttpPut("Update")]
         public async Task<IActionResult> Update(UpdateTripRequest request)
         {
             try
@@ -54,7 +54,7 @@ namespace Api.Controllers.v1
         }
 
 
-        [HttpDelete("DeleteTrip/{id}")]
+        [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(Guid id)
         {
             try
